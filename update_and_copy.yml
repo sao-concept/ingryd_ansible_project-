@@ -1,0 +1,66 @@
+---
+- hosts: file_servers
+  become: true
+  tasks:
+    - name: Update Repository Index (Ubuntu)
+      when: ansible_distribution == "Ubuntu"
+      apt:
+        update_cache: yes
+
+    - name: Install Packages on Ubuntu
+      when: ansible_distribution == "Ubuntu"
+      apt:
+        name:
+          - apache2
+          - libapache2-mod-php
+          - htop
+        state: latest
+
+    - name: Update Repository Index (Oracle Linux)
+      when: ansible_distribution == "Oracle Linux"
+      dnf:
+        update_cache: yes
+
+    - name: Install Packages on Oracle Linux
+      when: ansible_distribution == "Oracle Linux"
+      dnf:
+        name:
+          - httpd
+          - php
+          - htop
+        state: latest
+
+    - name: Install NFS Server on Red Hat
+      when: ansible_distribution == "RedHat"
+      package:
+        name: nfs-utils
+        state: present
+
+    - name: Start and Enable NFS Service on Red Hat
+      when: ansible_distribution == "RedHat"
+      service:
+        name: nfs
+        state: started
+        enabled: yes
+
+    - name: Install NFS Server on Ubuntu
+      when: ansible_distribution == "Ubuntu"
+      apt:
+        name: nfs-kernel-server
+        state: present
+
+    - name: Start and Enable NFS Service on Ubuntu
+      when: ansible_distribution == "Ubuntu"
+      systemd:
+        name: nfs-kernel-server
+        state: started
+        enabled: yes
+
+    - name: Create instruction_manual.txt
+      become_user: "{{ ansible_ssh_user }}"
+      copy:
+        content: |
+          This is the instruction manual.
+          Please follow the guidelines carefully.
+        dest: "~/instruction_manual.txt"
+

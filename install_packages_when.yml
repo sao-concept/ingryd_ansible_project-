@@ -1,4 +1,3 @@
----
 - hosts: all
   become: true
   tasks:
@@ -7,20 +6,25 @@
         update_cache: yes
       when: ansible_distribution == "Ubuntu"
 
-    - name: Install Apache
-      apt:
-        name: apache2
-        state: latest
+    - name: Install Packages on Ubuntu
       when: ansible_distribution == "Ubuntu"
+      apt:
+        name:
+          - apache2
+          - libapache2-mod-php
+          - htop
+        state: latest
 
-    - name: Add PHP support for Apache
-      apt:
-        name: libapache2-mod-php
-        state: latest
-      when: ansible_distribution == "Ubuntu"
+    - name: Update Repository Index
+      dnf:
+        update_cache: yes
+      when: ansible_distribution == "Oracle Linux"
 
-    - name: Install htop
-      apt:
-        name: htop
+    - name: Install Packages on Oracle Linux
+      when: ansible_distribution == "Oracle Linux"
+      dnf:
+        name:
+          - httpd
+          - php
+          - htop
         state: latest
-      when: ansible_distribution == "Ubuntu"
